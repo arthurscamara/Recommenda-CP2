@@ -1,0 +1,15 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+.DS_Store
+
+## Secrets — nunca commitar
+appsettings.*.local.json
+secrets.json
+
+## EF migrations backup
+*.bak
