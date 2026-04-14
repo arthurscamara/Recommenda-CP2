@@ -1,94 +1,167 @@
-# 📌 CP2 — Persistência com EF Core, Mapeamento e Camada de Infraestrutura
-        
-## 🎯 Objetivo
+# Recommenda — CP2
 
-1. **Persistir o modelo COMPLETO do MER** usando **Entity Framework Core** (.NET 9/10), respeitando o **Clean Architecture**:
-   - `DbContext` na camada **Infrastructure**.
-   - **Mapeamento** das entidades (Fluent API).
-   - **Relacionamentos** fiéis ao CP1: cardinalidade, opcionalidade, chaves primárias/estrangeiras e índices quando fizer sentido (ex.: unicidade, FKs).
-
-2. **Migrations** versionadas no repositório:
-   - Pelo menos **uma migration inicial** que materialize o esquema completo (no máximo duas migrations, se houver justificativa explícita no README).
-   - Banco de dados à escolha do grupo, desde que a execução seja **reproduzível** (ex.: **SQLite** para simplicidade; **SQL Server**, **PostgreSQL**, **Oracle** ou **MySQL** com instruções claras no README).
-
-3. **Padrão de acesso a dados**:
-   - Interfaces de repositório na camada **Application**
-   - Implementações na **Infrastructure**.
-   - **Injeção de dependência** registrada no **Program.cs** do projeto **API**.
-
-4. **Configuração segura**:
-   - Connection string em `appsettings` (e `User Secrets` / variáveis de ambiente para dados sensíveis em desenvolvimento).
-   - **Não** commitar senhas ou segredos reais.
+Plataforma de descoberta e avaliação musical (estilo Last.fm).
+Usuários avaliam álbuns e faixas, criam playlists e acompanham artistas.
 
 ---
 
-## 👥 Forma de Trabalho
+## Integrante
 
-- O trabalho deverá ser realizado **em grupo** com até **3 integrantes**.
-- Cada grupo deverá entregar **um único repositório** no GitHub.
-- Somente **um integrante** deverá entregar o link no portal do aluno.
+Nome: Arthur Câmara RM:562310
 
 ---
 
-## 🧭 Escopo (o que fazer)
+## Domínio
 
-1. Adicionar os pacotes NuGet necessários ao **EF Core** e ao **provider** do banco escolhido (e `Microsoft.EntityFrameworkCore.Design` no projeto correto para gerar migrations).
-2. Criar o **`DbContext`** (ex.: `ApplicationDbContext`) incluindo **todas** as entidades modeladas no CP1.
-3. Implementar o mapeamento (**Fluent API** com `IEntityTypeConfiguration<T>` e/ou **Data Annotations**):
-   - **Mínimo obrigatório:** mapear explicitamente todas as entidades que participam de relacionamentos **N:N** ou com **opcionalidade** que não seja óbvia só pelas propriedades.
-4. Gerar **migration(es)** e garantir que o banco seja criado/atualizado com sucesso (ex.: `dotnet ef database update`).
-5. Implementar **repositório genérico** *ou* **repositórios por agregado** — **uma** estratégia, aplicada de forma consistente.
-6. Registrar serviços no container de DI (**AddDbContext**, repositórios/UoW).
-7. **Validação do cenário** — **uma** das opções (definir em conjunto com o professor):
-   - **(A)** Apenas camada de dados + README com comandos e evidência (print da ferramenta do banco ou do esquema gerado); **ou**
-   - **(B)** Incluir **um endpoint mínimo** (ex.: `GET` de health + **um** `GET` que demonstre leitura no banco, com **seed** opcional de dados de exemplo).
+Sistema de descoberta e avaliação musical. Os usuários se cadastram, avaliam álbuns e faixas com notas de 1 a 5, montam playlists personalizadas e exploram artistas por gênero musical.
 
 ---
 
-## 🧱 Restrições (o que NÃO fazer)
+## Entidades modeladas
 
-- ❌ Nada de regras de negócio complexas na **Infrastructure** (foco em persistência, mapeamento e acesso a dados).
-- ❌ Não commitar **credenciais reais** nem connection strings com segredos.
-- ✅ Foco em **EF Core**, **migrations**, **mapeamento** e **organização** em camadas.
-
----
-
-## 🗂️ Entregáveis (no GitHub público)
-
-- Solução atualizada com **Infrastructure** contendo `DbContext`, implementações de repositório e pasta de **Migrations**.
-- **`README.md`** na raiz **atualizado** com:
-  - Nome e RM dos integrantes do grupo.
-  - Domínio escolhido (pode resumir o do CP1).
-  - **Qual SGBD** foi usado
-- **`/docs/`** (recomendado): diagrama ou print do **esquema físico** no banco (ou atualização do MER se o modelo evoluiu, com breve justificativa).
-- A entrega no portal continua sendo **somente o link do Git** (não enviar ZIP do código).
+| Entidade | Descrição |
+|----------|-----------|
+| `User` | Usuário da plataforma |
+| `UserProfile` | Perfil público do usuário (bio, avatar) — 1:1 opcional |
+| `Artist` | Artista ou banda musical |
+| `Album` | Álbum de estúdio ou EP de um artista |
+| `Track` | Faixa musical dentro de um álbum |
+| `Genre` | Gênero musical (Rock, Jazz, etc.) |
+| `AlbumRating` | Avaliação (1–5) de um usuário sobre um álbum |
+| `TrackRating` | Avaliação (1–5) de um usuário sobre uma faixa |
+| `Playlist` | Coleção de faixas criada por um usuário |
 
 ---
 
-## 🏅 Avaliação (até 10 pontos)
+## Relacionamentos
 
-| Critério | Pontos |
-|----------|--------|
-| **Mapeamento EF** — Fluent API/anotações, tipos, nullability, relacionamentos fiéis ao MER | até **3,0** |
-| **Migrations e banco** — migration aplicável sem erros, esquema coerente | até **2,5** |
-| **Clean Architecture** — DbContext e implementações na Infrastructure; contratos claros; DI correto na API | até **2,5** |
-| **Repositórios* — interfaces bem definidas, uso consistente, sem acoplamento indevido | até **2,0** |
-
----
-
-## 🌟 Propósito
-
-> “Faça o teu melhor, na condição que você tem, enquanto você não tem condições melhores, para fazer melhor ainda”  
-> — Mario Sergio Cortella
+| Relação | Cardinalidade | Detalhe |
+|---------|--------------|---------|
+| Artist → Album | 1 : N | Um artista tem vários álbuns |
+| Album → Track | 1 : N | Um álbum tem várias faixas |
+| User → AlbumRating | 1 : N | Um usuário avalia vários álbuns |
+| User → TrackRating | 1 : N | Um usuário avalia várias faixas |
+| User → Playlist | 1 : N | Um usuário cria várias playlists |
+| User → UserProfile | 1 : 1 | Perfil público opcional |
+| Artist ↔ Genre | N : N | Tabela `RC_ArtistGenres` |
+| Track ↔ Genre | N : N | Tabela `RC_TrackGenres` |
+| Playlist ↔ Track | N : N | Tabela `RC_PlaylistTracks` |
 
 ---
 
-## 📎 Relação com o CP1
+## SGBD utilizado
 
-| CP1 | CP2 |
-|-----|-----|
-| MER + entidades em C# | Esquema físico + EF Core + migrations |
-| Sem banco de dados | Banco configurado e reproduzível |
-| Sem persistência | Repositórios/UoW + DI |
+**MySQL 8** via driver **Pomelo.EntityFrameworkCore.MySql 9.0.0**.
 
 ---
+
+## Como executar
+
+### Pré-requisitos
+
+- .NET 9 SDK
+- MySQL 8 em execução (local ou Docker)
+- Ferramenta EF Core CLI:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+### 1. Configurar a connection string
+
+Use User Secrets para não expor credenciais no repositório:
+
+```bash
+cd Recommenda.API
+dotnet user-secrets set "ConnectionStrings:RecommendaMySQL" \
+  "Server=127.0.0.1;Port=3306;Database=recommenda_music;User=root;Password=SuaSenha;"
+```
+
+O `appsettings.json` já contém um exemplo com placeholder — **nunca commite senhas reais**.
+
+### 2. Gerar e aplicar a migration inicial
+
+```bash
+dotnet ef migrations add Initial \
+  --project Recommenda.Infrastructure \
+  --startup-project Recommenda.API
+
+dotnet ef database update \
+  --project Recommenda.Infrastructure \
+  --startup-project Recommenda.API
+```
+
+A aplicação também aplica migrations automaticamente ao iniciar (`db.Database.Migrate()` no `Program.cs`).
+
+### 3. Executar a API
+
+```bash
+cd Recommenda.API
+dotnet run
+```
+
+### 4. Verificar saúde do banco
+
+```
+GET http://localhost:5283/health
+```
+
+Resposta esperada:
+```json
+{
+  "status": "healthy",
+  "database": "connected",
+  "timestamp": "2026-04-06T..."
+}
+```
+
+---
+
+## Endpoints disponíveis
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/health` | Verifica conexão com o banco |
+| GET | `/api/artist` | Lista todos os artistas |
+| GET | `/api/artist/{id}` | Busca artista por ID |
+| POST | `/api/artist` | Cadastra um artista |
+| DELETE | `/api/artist/{id}` | Remove um artista |
+| GET | `/api/album` | Lista todos os álbuns |
+| GET | `/api/album/{id}` | Busca álbum por ID |
+| GET | `/api/album/artist/{artistId}` | Álbuns de um artista |
+| POST | `/api/album` | Cadastra um álbum |
+| DELETE | `/api/album/{id}` | Remove um álbum |
+| GET | `/api/albumrating/album/{albumId}` | Avaliações de um álbum |
+| GET | `/api/albumrating/user/{userId}` | Avaliações de um usuário |
+| POST | `/api/albumrating` | Registra avaliação de álbum |
+
+---
+
+## Arquitetura (Clean Architecture)
+
+```
+Recommenda.sln
+├── Recommenda.Domain          — Entidades, enums (sem dependências externas)
+├── Recommenda.Application     — Interfaces de repositório, DTOs
+├── Recommenda.Infrastructure  — DbContext, Fluent API, repositórios, Migrations
+└── Recommenda.API             — Controllers, Program.cs, DI
+```
+
+### Repositórios registrados no DI
+
+| Interface (Application) | Implementação (Infrastructure) |
+|------------------------|-------------------------------|
+| `IArtistRepository` | `ArtistRepository` |
+| `IAlbumRepository` | `AlbumRepository` |
+| `ITrackRepository` | `TrackRepository` |
+| `IGenreRepository` | `GenreRepository` |
+| `IUserRepository` | `UserRepository` |
+| `IAlbumRatingRepository` | `AlbumRatingRepository` |
+| `ITrackRatingRepository` | `TrackRatingRepository` |
+| `IPlaylistRepository` | `PlaylistRepository` |
+
+---
+
+## Esquema físico
+
+Veja `/docs/schema.md` para o diagrama de tabelas gerado pela migration.
