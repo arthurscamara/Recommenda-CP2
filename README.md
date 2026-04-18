@@ -59,7 +59,7 @@ Sistema de descoberta e avaliação musical. Os usuários se cadastram, avaliam 
 
 ### Pré-requisitos
 
-- .NET 9 SDK
+- .NET 10 SDK
 - MySQL 8 em execução (local ou Docker)
 - Ferramenta EF Core CLI:
 
